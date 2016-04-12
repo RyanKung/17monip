@@ -3,6 +3,7 @@
 import os
 import socket
 import struct
+import re
 try:
     import mmap
 except ImportError:
@@ -12,6 +13,7 @@ __all__ = ['IPv4Database', 'find']
 
 _unpack_V = lambda b: struct.unpack("<L", b)[0]
 _unpack_N = lambda b: struct.unpack(">L", b)[0]
+is_ip = lambda ip: re.match(r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$', ip)
 
 
 def _unpack_C(b):
@@ -87,7 +89,7 @@ class IPv4Database(object):
         while lo < hi:
             mid = (lo + hi) // 2
             mid_offset = pos + 1028 + 8 * mid
-            mid_val = self._buf[mid_offset: mid_offset+4]
+            mid_val = self._buf[mid_offset: mid_offset + 4]
 
             if mid_val < nip:
                 lo = mid + 1
@@ -113,11 +115,20 @@ class IPv4Database(object):
 
 
 def find(ip):
-    # keep find for compatibility
-    try:
-        ip = socket.gethostbyname(ip)
-    except socket.gaierror:
-        return
+    '''
+    keep find for compatibility
+
+    >>> import IP
+    >>> IP.find("www.baidu.com")
+    '中国\t浙江\t杭州'
+    >>> IP.find("127.0.0.1")
+    '本机地址\t本机地址'
+    '''
+    if is_ip(ip):
+        try:
+            ip = socket.gethostbyname(ip)
+        except socket.gaierror:
+            return
 
     with IPv4Database() as db:
         return db.find(ip)
