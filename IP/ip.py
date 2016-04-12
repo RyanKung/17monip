@@ -11,9 +11,19 @@ except ImportError:
 
 __all__ = ['IPv4Database', 'find']
 
-_unpack_V = lambda b: struct.unpack("<L", b)[0]
-_unpack_N = lambda b: struct.unpack(">L", b)[0]
-is_ip = lambda ip: re.match(r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$', ip)
+
+def _unpack_V(b):
+    return struct.unpack("<L", b)[0]
+
+
+def _unpack_N(b):
+    return struct.unpack(">L", b)[0]
+
+
+def is_ip(ip):
+    ip_exp = r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.)' + \
+             r'{3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$',
+    return re.match(ip_exp, ip)
 
 
 def _unpack_C(b):
