@@ -124,7 +124,7 @@ def find(ip):
     >>> IP.find("127.0.0.1")
     '本机地址\t本机地址'
     '''
-    if is_ip(ip):
+    if not is_ip(ip):
         try:
             ip = socket.gethostbyname(ip)
         except socket.gaierror:
